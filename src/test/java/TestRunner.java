@@ -7,6 +7,9 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
 public class TestRunner {
     private WebHomePage webHomePage;
     private WebLoginPage webLoginPage;
@@ -60,5 +63,43 @@ public class TestRunner {
             mobileLoginPage.fillTwitterLoginCredentials(username, password);
             mobileLoginPage.waitForHomeTitle();
         }
+    }
+
+    @Test(dataProvider = "drivers")
+    public void ut(String platform, RemoteWebDriver platformDriver) {
+        String username = getPropertyByPlatform("login.twitter.username", platform);
+        String password = getPropertyByPlatform("login.twitter.password", platform);
+        String searchTitle = "sprint boot";
+        String expectedTitle = "How to scale Microservices with Message Queues, Spring Boot, and Kubernetes";
+        String actualTitle = "";
+        //        Given user has logged into Medium application
+//        When user searches for ‘spring boot’
+//        Then user should see ‘How to scale Microservices with Message Queues, Spring Boot, and Kubernetes’ as the first article
+        if (isCurrentPlatformWeb(platform)) {
+            webHomePage = new WebHomePage(platformDriver);
+            webLoginPage = new WebLoginPage(platformDriver);
+
+            webHomePage.openPage();
+            webHomePage.goToTwitterLoginPage();
+
+            webLoginPage.fillTwitterLoginCredentials(username, password);
+
+            webHomePage.searchForArticle(searchTitle);
+            actualTitle = webHomePage.getFirstArticleTitle();
+        }
+
+        if (isCurrentPlatformMobile(platform)) {
+            mobileHomePage = new MobileHomePage((AppiumDriver) platformDriver);
+            mobileLoginPage = new MobileLoginPage((AppiumDriver) platformDriver);
+
+            mobileHomePage.goToTwitterLoginPage();
+
+            mobileLoginPage.fillTwitterLoginCredentials(username, password);
+            mobileLoginPage.waitForHomeTitle();
+
+            mobileHomePage.searchForArticle(searchTitle);
+            actualTitle = mobileHomePage.getFirstArticleTitle();
+        }
+        assertThat(actualTitle, equalTo(expectedTitle));
     }
 }

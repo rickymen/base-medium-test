@@ -12,6 +12,8 @@ public class MobileLoginPage extends MobilePageObject {
     private By TWITTER_SIGN_IN_BUTTON = MobileBy.xpath("//android.widget.Button[@resource-id='allow']");
     private By MOBILE_HOME_TITLE = MobileBy.id("com.medium.reader:id/title");
 
+    private By LOGIN_ERROR_TEXT =MobileBy.xpath("//android.widget.TextView[contains(@text, 'did not match')]");
+
 
     public MobileLoginPage(AppiumDriver appiumDriver) {
         super(appiumDriver);
@@ -26,6 +28,10 @@ public class MobileLoginPage extends MobilePageObject {
 
         WebElement twitterSignInButton = getElementAfterClickable(TWITTER_SIGN_IN_BUTTON);
         twitterSignInButton.click();
+    }
+
+    public String getLoginErrorText() {
+        return getElementAfterVisible(LOGIN_ERROR_TEXT).getText();
     }
 
     public void waitForHomeTitle() {
